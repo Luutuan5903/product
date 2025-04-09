@@ -1647,6 +1647,40 @@ namespace FinallyProject.Migrations
                     b.ToTable("AbpTenants");
                 });
 
+            modelBuilder.Entity("FinallyProject.Products.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("CreatorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("LastModifierUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AppCategories");
+                });
+
             modelBuilder.Entity("FinallyProject.Products.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -1655,9 +1689,8 @@ namespace FinallyProject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Category")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("datetime2");
@@ -1684,6 +1717,8 @@ namespace FinallyProject.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.ToTable("AppProducts");
                 });
@@ -1933,6 +1968,15 @@ namespace FinallyProject.Migrations
                     b.Navigation("LastModifierUser");
                 });
 
+            modelBuilder.Entity("FinallyProject.Products.Product", b =>
+                {
+                    b.HasOne("FinallyProject.Products.Category", "Category")
+                        .WithMany("Products")
+                        .HasForeignKey("CategoryId");
+
+                    b.Navigation("Category");
+                });
+
             modelBuilder.Entity("Abp.Application.Features.EditionFeatureSetting", b =>
                 {
                     b.HasOne("Abp.Application.Editions.Edition", "Edition")
@@ -2002,6 +2046,11 @@ namespace FinallyProject.Migrations
                     b.Navigation("Settings");
 
                     b.Navigation("Tokens");
+                });
+
+            modelBuilder.Entity("FinallyProject.Products.Category", b =>
+                {
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

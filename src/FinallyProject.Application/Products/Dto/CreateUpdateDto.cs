@@ -10,16 +10,13 @@ namespace FinallyProject.Products.Dto
     public class CreateUpdateDto
     {
         [Required]
-        [StringLength(Product.MaxNameLength)]
         public string Name { get; set; }
 
         [Required]
         public decimal Price { get; set; }
 
-        [StringLength(Product.MaxImageLength)]
         public string Image { get; set; }
 
-        [StringLength(Product.MaxCategoryLength)]
-        public string Category { get; set; }
+        public int? CategoryId { get; set; } // Dropdown dùng Id
     }
 }

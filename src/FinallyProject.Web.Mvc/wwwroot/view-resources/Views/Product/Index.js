@@ -46,7 +46,7 @@
             },
             {
                 targets: 3,
-                data: 'category',
+                data: 'categoryName',
                 sortable: false
             },
             {
@@ -70,7 +70,7 @@
 
     _$form.validate({
         rules: {
-            Name: "required",
+            ProductName: "required",
             Price: {
                 required: true,
                 number: true
@@ -78,20 +78,29 @@
         }
     });
 
+    // Cập nhật phần save button
     _$form.find('.save-button').on('click', function (e) {
         e.preventDefault();
         if (!_$form.valid()) return;
 
-        var product = _$form.serializeFormToObject();
+        var formData = new FormData(_$form[0]); // 👈 gửi cả file
 
         abp.ui.setBusy(_$modal);
-        _productService.create(product).done(function () {
-            _$modal.modal('hide');
-            _$form[0].reset();
-            abp.notify.info(l('SavedSuccessfully'));
-            _$productsTable.ajax.reload();
-        }).always(function () {
-            abp.ui.clearBusy(_$modal);
+        $.ajax({
+            url: abp.appPath + 'Products/Create', // hoặc route đúng trong controller
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function () {
+                _$modal.modal('hide');
+                _$form[0].reset();
+                abp.notify.info(l('SavedSuccessfully'));
+                _$productsTable.ajax.reload();
+            },
+            complete: function () {
+                abp.ui.clearBusy(_$modal);
+            }
         });
     });
 

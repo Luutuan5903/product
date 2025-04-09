@@ -21,5 +21,14 @@ namespace FinallyProject.Products
 
         [StringLength(MaxDescriptionLength)]
         public string Description { get; set; }
+
+        // Quan hệ 1 - n: Một danh mục có thể có nhiều sản phẩm
+        public virtual ICollection<Product> Products { get; set; }
+
+        public Category()
+        {
+            Products = new List<Product>();
+        }
     }
+
 }

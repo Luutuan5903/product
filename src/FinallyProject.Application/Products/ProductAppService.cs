@@ -7,6 +7,7 @@ using Abp.Application.Services;
 using Abp.Application.Services.Dto;
 using Abp.Domain.Repositories;
 using FinallyProject.Products.Dto;
+using Microsoft.EntityFrameworkCore;
 
 namespace FinallyProject.Products
 {
@@ -21,26 +22,31 @@ namespace FinallyProject.Products
 
         public async Task<PagedResultDto<ProductDto>> GetAllAsync()
         {
-            var products = await _productRepository.GetAllListAsync();
+            var query = await _productRepository
+                .GetAllIncluding(p => p.Category)
+                .ToListAsync();
 
-            var result = products.Select(p => new ProductDto
+            var result = query.Select(p => new ProductDto
             {
                 Id = p.Id,
                 Name = p.Name,
                 Price = p.Price,
                 Image = p.Image,
-                Category = p.Category
+                CategoryId = p.CategoryId,
+                CategoryName = p.Category?.Name // ✅ Lấy tên danh mục
             }).ToList();
 
             return new PagedResultDto<ProductDto>(
-                result.Count, // totalCount
-                result        // items
+                result.Count,
+                result
             );
         }
 
         public async Task<ProductDto> GetAsync(int id)
         {
-            var product = await _productRepository.GetAsync(id);
+            var product = await _productRepository
+                .GetAllIncluding(p => p.Category)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
             return new ProductDto
             {
@@ -48,7 +54,8 @@ namespace FinallyProject.Products
                 Name = product.Name,
                 Price = product.Price,
                 Image = product.Image,
-                Category = product.Category
+                CategoryId = product.CategoryId,
+                CategoryName = product.Category?.Name // ✅ Lấy tên danh mục
             };
         }
 
@@ -59,18 +66,24 @@ namespace FinallyProject.Products
                 Name = input.Name,
                 Price = input.Price,
                 Image = input.Image,
-                Category = input.Category
+                CategoryId = input.CategoryId
             };
 
-            var newProductId = await _productRepository.InsertAndGetIdAsync(product);
+            await _productRepository.InsertAsync(product);
+
+            // Tải lại để lấy luôn CategoryName
+            var createdProduct = await _productRepository
+                .GetAllIncluding(p => p.Category)
+                .FirstOrDefaultAsync(p => p.Id == product.Id);
 
             return new ProductDto
             {
-                Id = newProductId,
-                Name = product.Name,
-                Price = product.Price,
-                Image = product.Image,
-                Category = product.Category
+                Id = createdProduct.Id,
+                Name = createdProduct.Name,
+                Price = createdProduct.Price,
+                Image = createdProduct.Image,
+                CategoryId = createdProduct.CategoryId,
+                CategoryName = createdProduct.Category?.Name // ✅
             };
         }
 
@@ -81,17 +94,23 @@ namespace FinallyProject.Products
             product.Name = input.Name;
             product.Price = input.Price;
             product.Image = input.Image;
-            product.Category = input.Category;
+            product.CategoryId = input.CategoryId;
 
             await _productRepository.UpdateAsync(product);
 
+            // Tải lại để lấy CategoryName
+            var updatedProduct = await _productRepository
+                .GetAllIncluding(p => p.Category)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
             return new ProductDto
             {
-                Id = product.Id,
-                Name = product.Name,
-                Price = product.Price,
-                Image = product.Image,
-                Category = product.Category
+                Id = updatedProduct.Id,
+                Name = updatedProduct.Name,
+                Price = updatedProduct.Price,
+                Image = updatedProduct.Image,
+                CategoryId = updatedProduct.CategoryId,
+                CategoryName = updatedProduct.Category?.Name // ✅
             };
         }
 
@@ -99,7 +118,6 @@ namespace FinallyProject.Products
         {
             await _productRepository.DeleteAsync(id);
         }
-
-        
     }
 }
+

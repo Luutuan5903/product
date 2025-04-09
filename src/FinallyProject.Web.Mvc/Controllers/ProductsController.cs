@@ -10,10 +10,14 @@ namespace FinallyProject.Web.Controllers
     public class ProductsController : FinallyProjectControllerBase
     {
         private readonly IProductAppService _productService;
+        private readonly ICategoryAppService _categoryService;
 
-        public ProductsController(IProductAppService productService)
+        public ProductsController(
+            IProductAppService productService,
+            ICategoryAppService categoryService)
         {
             _productService = productService;
+            _categoryService = categoryService;
         }
 
         // Danh sách sản phẩm
@@ -25,8 +29,10 @@ namespace FinallyProject.Web.Controllers
         }
 
         // GET: Tạo sản phẩm mới
-        public ActionResult Create()
+        public async Task<ActionResult> Create()
         {
+            var categories = await _categoryService.GetAllAsync();
+            ViewBag.Categories = categories.Items;
             return View();
         }
 
@@ -40,6 +46,9 @@ namespace FinallyProject.Web.Controllers
                 await _productService.CreateAsync(input);
                 return RedirectToAction("Index");
             }
+
+            var categories = await _categoryService.GetAllAsync();
+            ViewBag.Categories = categories.Items;
             return View(input);
         }
 
@@ -52,9 +61,13 @@ namespace FinallyProject.Web.Controllers
                 Name = product.Name,
                 Price = product.Price,
                 Image = product.Image,
-                Category = product.Category
+                CategoryId = product.CategoryId
             };
+
+            var categories = await _categoryService.GetAllAsync();
+            ViewBag.Categories = categories.Items;
             ViewBag.ProductId = product.Id;
+
             return View(updateDto);
         }
 
@@ -68,7 +81,11 @@ namespace FinallyProject.Web.Controllers
                 await _productService.UpdateAsync(id, input);
                 return RedirectToAction("Index");
             }
+
+            var categories = await _categoryService.GetAllAsync();
+            ViewBag.Categories = categories.Items;
             ViewBag.ProductId = id;
+
             return View(input);
         }
 

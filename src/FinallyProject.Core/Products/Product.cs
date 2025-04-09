@@ -28,8 +28,10 @@ namespace FinallyProject.Products
         [StringLength(MaxImageLength)]
         public string Image { get; set; }
 
-        [StringLength(MaxCategoryLength)]
-        public string Category { get; set; }
+        [ForeignKey("Category")]
+        public int? CategoryId { get; set; }  // Có thể null nếu chưa gán danh mục
+
+        public virtual Category Category { get; set; }
 
 
 
@@ -37,12 +39,12 @@ namespace FinallyProject.Products
         {
         }
 
-        public Product(string name, decimal price, string image = null, string category = null)
+        public Product(tring name, decimal price, string image = null, int? categoryId = null)
         {
             Name = name;
             Price = price;
             Image = image;
-            Category = category;
+            CategoryId = categoryId;
 
         }
     }

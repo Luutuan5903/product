@@ -8,18 +8,22 @@ namespace FinallyProject.Web.Models.Product
     {
         private PagedResultDto<ProductDto> products;
 
-        public IReadOnlyList<ProductDto> Products { get; }
+        public IReadOnlyList<ProductDto> Products { get; set; }
+        public IReadOnlyList<CategoryDto> Categories { get; set; }
 
-        public IndexViewModel(IReadOnlyList<ProductDto> products)
+        public IndexViewModel()
+        {
+        }
+
+        public IndexViewModel(IReadOnlyList<ProductDto> products, IReadOnlyList<CategoryDto> categories)
         {
             Products = products;
+            Categories = categories;
         }
 
         public IndexViewModel(PagedResultDto<ProductDto> products)
         {
             this.products = products;
         }
-
-        public List<CategoryViewModel> Categories { get; set; } = new List<CategoryViewModel>();
     }
 }
