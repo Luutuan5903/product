@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using FinallyProject.Web.Models.Product;
 using FinallyProject.Products.Dto;
+using System.Linq;
 
 namespace FinallyProject.Web.Controllers
 {
@@ -21,36 +22,61 @@ namespace FinallyProject.Web.Controllers
         }
 
         // Danh sách sản phẩm
+
         public async Task<ActionResult> Index()
         {
             var products = await _productService.GetAllAsync();
-            var model = new IndexViewModel(products);
+            var categories = await _categoryService.GetAllAsync();
+
+            var model = new IndexViewModel
+            {
+                Products = products.Items.ToList(), // Nếu products là PagedResultDto<ProductDto>
+                Categories = categories.Items.ToList()
+            };
+
             return View(model);
         }
+
 
         // GET: Tạo sản phẩm mới
         public async Task<ActionResult> Create()
         {
             var categories = await _categoryService.GetAllAsync();
-            ViewBag.Categories = categories.Items;
-            return View();
+
+            var model = new ProductCreateViewModel
+            {
+                Categories = categories.Items.ToList()
+            };
+
+            return View(model);
         }
+
 
         // POST: Tạo sản phẩm
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(CreateUpdateDto input)
+        public async Task<ActionResult> Create(ProductCreateViewModel input)
         {
             if (ModelState.IsValid)
             {
-                await _productService.CreateAsync(input);
+                var productDto = new CreateUpdateDto
+                {
+                    Name = input.ProductName,
+                    Price = input.Price,
+                    Image = input.ProductImage,
+                    CategoryId = input.CategoryId
+                };
+
+                await _productService.CreateAsync(productDto);
                 return RedirectToAction("Index");
             }
 
             var categories = await _categoryService.GetAllAsync();
-            ViewBag.Categories = categories.Items;
+            input.Categories = categories.Items.ToList();
+
             return View(input);
         }
+
 
         // GET: Chỉnh sửa sản phẩm
         public async Task<ActionResult> Edit(int id)
@@ -61,7 +87,7 @@ namespace FinallyProject.Web.Controllers
                 Name = product.Name,
                 Price = product.Price,
                 Image = product.Image,
-                CategoryId = product.CategoryId
+                
             };
 
             var categories = await _categoryService.GetAllAsync();

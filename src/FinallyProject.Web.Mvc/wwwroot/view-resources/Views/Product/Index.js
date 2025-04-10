@@ -83,11 +83,10 @@
         e.preventDefault();
         if (!_$form.valid()) return;
 
-        var formData = new FormData(_$form[0]); // 👈 gửi cả file
-
+        var formData = new FormData(_$form[0]); 
         abp.ui.setBusy(_$modal);
         $.ajax({
-            url: abp.appPath + 'Products/Create', // hoặc route đúng trong controller
+            url: abp.appPath + 'Products/Create',
             type: 'POST',
             data: formData,
             contentType: false,

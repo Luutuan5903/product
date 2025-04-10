@@ -22,18 +22,17 @@ namespace FinallyProject.Products
 
         public async Task<PagedResultDto<ProductDto>> GetAllAsync()
         {
-            var query = await _productRepository
+            var products = await _productRepository
                 .GetAllIncluding(p => p.Category)
                 .ToListAsync();
 
-            var result = query.Select(p => new ProductDto
+            var result = products.Select(p => new ProductDto
             {
                 Id = p.Id,
                 Name = p.Name,
                 Price = p.Price,
                 Image = p.Image,
-                CategoryId = p.CategoryId,
-                CategoryName = p.Category?.Name // ✅ Lấy tên danh mục
+                CategoryName = p.Category?.Name
             }).ToList();
 
             return new PagedResultDto<ProductDto>(
@@ -41,6 +40,8 @@ namespace FinallyProject.Products
                 result
             );
         }
+
+
 
         public async Task<ProductDto> GetAsync(int id)
         {
@@ -54,8 +55,7 @@ namespace FinallyProject.Products
                 Name = product.Name,
                 Price = product.Price,
                 Image = product.Image,
-                CategoryId = product.CategoryId,
-                CategoryName = product.Category?.Name // ✅ Lấy tên danh mục
+                
             };
         }
 
@@ -70,8 +70,9 @@ namespace FinallyProject.Products
             };
 
             await _productRepository.InsertAsync(product);
+            await CurrentUnitOfWork.SaveChangesAsync();
 
-            // Tải lại để lấy luôn CategoryName
+            // Tải lại để lấy cả thông tin category
             var createdProduct = await _productRepository
                 .GetAllIncluding(p => p.Category)
                 .FirstOrDefaultAsync(p => p.Id == product.Id);
@@ -82,8 +83,8 @@ namespace FinallyProject.Products
                 Name = createdProduct.Name,
                 Price = createdProduct.Price,
                 Image = createdProduct.Image,
-                CategoryId = createdProduct.CategoryId,
-                CategoryName = createdProduct.Category?.Name // ✅
+                CategoryId = createdProduct.CategoryId?.ToString(),
+                CategoryName = createdProduct.Category?.Name 
             };
         }
 
@@ -98,7 +99,7 @@ namespace FinallyProject.Products
 
             await _productRepository.UpdateAsync(product);
 
-            // Tải lại để lấy CategoryName
+            
             var updatedProduct = await _productRepository
                 .GetAllIncluding(p => p.Category)
                 .FirstOrDefaultAsync(p => p.Id == id);
@@ -109,8 +110,7 @@ namespace FinallyProject.Products
                 Name = updatedProduct.Name,
                 Price = updatedProduct.Price,
                 Image = updatedProduct.Image,
-                CategoryId = updatedProduct.CategoryId,
-                CategoryName = updatedProduct.Category?.Name // ✅
+                
             };
         }
 

@@ -8,17 +8,26 @@ namespace FinallyProject.Web.Models.Product
     {
         private PagedResultDto<ProductDto> products;
 
-        public IReadOnlyList<ProductDto> Products { get; set; }
-        public IReadOnlyList<CategoryDto> Categories { get; set; }
+        // Danh sách sản phẩm phân trang
+        public PagedResultDto<ProductDto> PagedProducts { get; set; }
 
+        // Danh sách sản phẩm tách riêng (đã có sẵn trong PagedProducts.Items, nhưng vẫn giữ lại nếu bạn dùng cho mục đích khác)
+        public IReadOnlyList<ProductDto> Products { get; set; } = new List<ProductDto>();
+
+        // Danh sách danh mục
+        public IReadOnlyList<CategoryDto> Categories { get; set; } = new List<CategoryDto>();
+
+        // Constructor mặc định
         public IndexViewModel()
         {
         }
 
-        public IndexViewModel(IReadOnlyList<ProductDto> products, IReadOnlyList<CategoryDto> categories)
+        // Constructor truyền PagedProducts và Categories
+        public IndexViewModel(PagedResultDto<ProductDto> pagedProducts, IReadOnlyList<CategoryDto> categories)
         {
-            Products = products;
-            Categories = categories;
+            PagedProducts = pagedProducts;
+            Products = pagedProducts?.Items ?? new List<ProductDto>();
+            Categories = categories ?? new List<CategoryDto>();
         }
 
         public IndexViewModel(PagedResultDto<ProductDto> products)

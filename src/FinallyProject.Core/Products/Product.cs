@@ -6,11 +6,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Abp.Domain.Entities.Auditing;
+using Abp.Domain.Entities;
 
 namespace FinallyProject.Products
 {
     [Table("AppProducts")]
-    public class Product : AuditedEntity<int>
+    public class Product : Entity<int>
     {
         public const int MaxNameLength = 100;
         public const int MaxImageLength = 255;
@@ -39,7 +40,7 @@ namespace FinallyProject.Products
         {
         }
 
-        public Product(tring name, decimal price, string image = null, int? categoryId = null)
+        public Product(string name, decimal price, string image = null, int? categoryId = null)
         {
             Name = name;
             Price = price;

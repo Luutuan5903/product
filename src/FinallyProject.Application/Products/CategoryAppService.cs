@@ -24,9 +24,13 @@ namespace FinallyProject.Products
         {
             var categories = await _categoryRepository.GetAllListAsync();
 
-            return new ListResultDto<CategoryDto>(
-                ObjectMapper.Map<List<CategoryDto>>(categories)
-            );
+            var categoryDtos = categories.Select(c => new CategoryDto
+            {
+                Id = c.Id,
+                Name = c.Name
+            }).ToList();
+
+            return new ListResultDto<CategoryDto>(categoryDtos);
         }
     }
 }

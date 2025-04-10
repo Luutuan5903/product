@@ -1,0 +1,57 @@
+﻿@using FinallyProject.Web.Models.Common.Modals
+@model EditProductModalViewModel
+
+@{
+    Layout = null;
+}
+
+@await Html.PartialAsync("~/Views/Shared/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel("Chỉnh sửa sản phẩm"))
+
+<form name="ProductEditForm" role="form" class="form-horizontal">
+    <input type="hidden" name="Id" value="@Model.Product.Id" />
+    <div class="modal-body">
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" role="tab" href="#edit-product-details">Chi tiết sản phẩm</a>
+            </li>
+        </ul>
+        <div class="tab-content mt-4">
+            <div role="tabpanel" class="tab-pane container active" id="edit-product-details">
+                <div class="form-group row required">
+                    <label class="col-md-3 col-form-label" for="productName">Tên sản phẩm</label>
+                    <div class="col-md-9">
+                        <input id="productName" type="text" class="form-control" name="Name" value="@Model.Product.Name" required maxlength="100">
+                    </div>
+                </div>
+                <div class="form-group row required">
+                    <label class="col-md-3 col-form-label" for="productPrice">Giá</label>
+                    <div class="col-md-9">
+                        <input id="productPrice" type="number" step="0.01" class="form-control" name="Price" value="@Model.Product.Price" required>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-md-3 col-form-label" for="productImage">Link ảnh</label>
+                    <div class="col-md-9">
+                        <input id="productImage" type="text" class="form-control" name="Image" value="@Model.Product.Image" maxlength="255">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-md-3 col-form-label" for="categoryId">Danh mục</label>
+                    <div class="col-md-9">
+                        <select id="categoryId" class="form-control" name="CategoryId">
+                            <option value="">-- Không chọn --</option>
+                            <option value="">@L("SelectCategory")</option>
+                            @foreach (var category in Model.Categories)
+                            {
+                                <option value="@category.Id">@category.Name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @await Html.PartialAsync("~/Views/Shared/Modals/_ModalFooterWithSaveAndCancel.cshtml")
+</form>
+
+<script src="~/view-resources/Views/Products/_EditModal.js" asp-append-version="true"></script>

@@ -16,5 +16,6 @@ namespace FinallyProject.EntityFrameworkCore
             : base(options)
         {
         }
+        
     }
 }
